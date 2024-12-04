@@ -1,0 +1,105 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f8f9fa;
+  }
+
+  header {
+    background-color: #007bff;
+    color: white;
+    padding: 20px;
+    text-align: center;
+  }
+
+  main {
+    padding: 20px;
+  }
+
+  .search-box {
+    background-color: #ffffff;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+  }
+
+  .search-box input, .search-box button {
+    padding: 10px;
+    margin: 5px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+  }
+
+  .search-box button {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    cursor: pointer;
+  }
+
+  .search-box button:hover {
+    background-color: #0056b3;
+  }
+
+  .ad {
+    background-color: #ffffff;
+    padding: 15px;
+    margin-bottom: 15px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+
+  .ad img {
+    width: 300px;
+    height: 300px;
+    object-fit: cover; /* сохраняет пропорции изображения и обрезает его, если необходимо */
+    border-radius: 8px;
+  }
+
+  .ad p {
+    margin: 5px 0;
+  }
+
+  footer {
+    background-color: #f1f1f1;
+    text-align: center;
+    padding: 10px 0;
+    margin-top: 20px;
+  }
+  .nav-link {
+      color: white;
+  }
+
+  .search-box {
+    background-color: #ffffff;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+  }
+
+  /* Скрытие блока паролей по умолчанию */
+  .password-section {
+    display: none;
+  }
+
+  /* Показываем блок паролей, если чекбокс выбран */
+  #autoRegister:checked ~ .password-section {
+    display: block;
+  }
+
+  .search-box input, .search-box button {
+    padding: 10px;
+    margin: 5px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+  }
+
+  .ad {
+    background-color: #ffffff;
+    padding: 15px;
+    margin-bottom: 15px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
