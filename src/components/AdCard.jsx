@@ -1,16 +1,28 @@
 import React from 'react';
 
 function AdCard({ ad }) {
+  // Если URL изображения относительный, добавляем базовый URL
+  const imageUrl = ad.photos.startsWith('http')
+    ? ad.photos
+    : `https://pets.сделай.site${ad.photos}`;
+
   return (
-    <div className="ad card mb-3">
-      <img src={ad.image} alt={ad.type} className="card-img-top" />
+    <div className="card mb-3">
+      <img
+        src={imageUrl}
+        alt={`Изображение ${ad.kind}`}
+        className="card-img-top"
+        onError={(e) => { e.target.src = '/placeholder.jpg'; }} // Если изображение не загружается
+      />
       <div className="card-body">
-        <p><strong>ID:</strong> {ad.id}</p>
-        <p><strong>Вид животного:</strong> {ad.type}</p>
-        <p><strong>Описание:</strong> {ad.description}</p>
-        <p><strong>Номер чипа:</strong> {ad.chipNumber}</p>
-        <p><strong>Район:</strong> {ad.region}</p>
-        <p><strong>Дата:</strong> {ad.date}</p>
+        <h5 className="card-title">{ad.kind}</h5>
+        <p className="card-text">{ad.description}</p>
+        <p className="card-text">
+          <small className="text-muted">Район: {ad.district}</small>
+        </p>
+        <p className="card-text">
+          <small className="text-muted">Дата: {ad.date}</small>
+        </p>
       </div>
     </div>
   );

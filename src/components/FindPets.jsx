@@ -1,80 +1,55 @@
-import React from 'react';
-import PetCard from './PetCard'; // Импортируем компонент карточки
-import cat from '../image/scale_1200.jfif';
-import koza from '../image/koza.jpg';
-import dog from '../image/dog.jpg';
-import parrot from '../image/Parrot.jpg';
-import rabbit from '../image/rabbit.jpg';
+import React, { useState, useEffect } from 'react';
+import AnimalCard from './animalCard1';
+import Spinner from 'react-bootstrap/Spinner';
 
-function FindPets() {
-  // Данные животных
-  const petsData = [
-    {
-      image: cat,
-      type: 'Кошка',
-      id: 14,
-      description: 'Потерялась кошка, пушистая, серая. Любит играть, ласковая.',
-      chipNumber: 'ca-001-spb',
-      region: 'Василеостровский',
-      date: '24-03-2020',
-    },
-    {
-      image: koza,
-      type: 'Коза',
-      id: 18,
-      description: 'Потерялась коза, последний раз видели в здании Московского вокзала г. Санкт-Петербург. Коза белая, пуховая.',
-      chipNumber: 'go-011-spb',
-      region: 'Центральный',
-      date: '14-03-2022',
-    },
-    {
-      image: dog,
-      type: 'Собака',
-      id: 22,
-      description: 'Потерялась собака, черная, среднего размера. Очень дружелюбная.',
-      chipNumber: 'do-003-moscow',
-      region: 'Пресненский',
-      date: '12-07-2023',
-    },
-    {
-      image: parrot,
-      type: 'Попугай',
-      id: 27,
-      description: 'Попугай с ярким зеленым оперением, улетел с балкона.',
-      chipNumber: 'pa-010-spb',
-      region: 'Петроградский',
-      date: '21-08-2024',
-    },
-    {
-      image: rabbit,
-      type: 'Кролик',
-      id: 34,
-      description: 'Потерян кролик, белый с черными пятнами. Очень активный.',
-      chipNumber: 'ra-005-kazan',
-      region: 'Ново-Савиновский',
-      date: '02-09-2024',
-    },
-  ];
+const FindPets = () => {
+  const [animals, setAnimals] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchAnimals = async () => {
+      try {
+        const response = await fetch('https://pets.сделай.site/api/pets');
+        const data = await response.json();
+        setAnimals(data.data.orders || []);
+      } catch (error) {
+        console.error('Ошибка загрузки данных:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchAnimals();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="d-flex justify-content-center
+align-items-center" style={{ height: '600px' }}>
+        <Spinner animation="border" />
+      </div>
+    );
+  }
+
+  if (animals.length === 0) {
+    return (
+      <div className="container py-4">
+        <h2 className="text-center mb-4">Недавно найденные животные</h2>
+        <p className="text-center text-muted">Нет доступных объявлений</p>
+      </div>
+    );
+  }
 
   return (
-    <div>
-      <h2 className="text-center text-white bg-primary m-4 p-3 rounded-3">Карточки найденных животных</h2>
-      <div className="d-flex flex-wrap justify-content-center">
-        {petsData.map((pet) => (
-          <PetCard
-            key={pet.id}
-            image={pet.image}
-            type={pet.type}
-            id={pet.id}
-            description={pet.description}
-            chipNumber={pet.chipNumber}
-            region={pet.region}
-            date={pet.date}
-          />
+    <div className="container py-4">
+      <h2 className="text-center mb-4">Недавно найденные животные</h2>
+      <div className="row row-cols-1 row-cols-md-3 g-4">
+        {animals.map((animal) => (
+          <AnimalCard key={animal.id} animal={animal} />
         ))}
       </div>
     </div>
   );
-}
+};
 
 export default FindPets;

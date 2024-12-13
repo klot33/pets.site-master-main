@@ -1,96 +1,82 @@
-import React, { useState } from 'react';
-import AdCard from './AdCard'; // Импортируем компонент AdCard
+import React, { useState, useEffect } from 'react';
 import '../pages/css/my.css';
 import '../pages/css/search.css';
-import dog from '../image/dog.jpg';
-import koza from '../image/koza.jpg';
-import cat from '../image/scale_1200.jfif';
+import SearchResults from './SearchResults';
+import { useCallback } from 'react';
 
-const ads = [
-  {
-    id: 18,
-    type: "Коза",
-    description: "Потерялась коза, последний раз видели в здании Московского вокзала г. Санкт-Петербург. Коза белая, пуховая.",
-    chipNumber: "go-011-spb",
-    region: "Центральный",
-    date: "14-03-2022",
-    image: koza
-  },
-  {
-    id: 14,
-    type: "Кошка",
-    description: "Потерялась кошка, пушистая, серая. Любит играть, ласковая.",
-    chipNumber: "ca-001-spb",
-    region: "Василеостровский",
-    date: "24-03-2020",
-    image: cat
-  },
-  {
-    id: 42,
-    type: "Собака",
-    description: "Собака рыжая, была утеряна в Красногвардейском районе.",
-    chipNumber: "do-123-spb",
-    region: "Красногвардейский",
-    date: "22-07-2023",
-    image: dog
-  }
-];
+const SearchPets = () => {
+  const [district, setDistrict] = useState('');
+  const [kind, setKind] = useState('');
+  const [results, setResults] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [totalPages, setTotalPages] = useState(1);
 
-function SearchPets() {
-  const [region, setRegion] = useState('');
-  const [animalType, setAnimalType] = useState('');
-  const [filteredAds, setFilteredAds] = useState(ads);
+  const fetchAnimals = useCallback(async () => {
+    setLoading(true);
+    try {
+      const response = await fetch(`https://pets.сделай.site/api/pets`);
+      const data = await response.json();
+      if (data.data?.orders) {
+        const sortedAnimals = [...data.data.orders].sort((a, b) => new
+Date(b.date) - new Date(a.date));
 
-  const handleFormSubmit = (event) => {
-    event.preventDefault();
+        // Фильтрация по району и виду
+        const filteredOrders = sortedAnimals.filter((order) => {
+          const matchesDistrict = district ?
+order.district.toLowerCase() === district.toLowerCase() : true;
+          const matchesKind = kind ?
+order.kind.toLowerCase().includes(kind.toLowerCase()) : true;
+          return matchesDistrict && matchesKind;
+        });
 
-    const filtered = ads.filter(ad => {
-      const matchesRegion = region ? ad.region.toLowerCase().includes(region.toLowerCase()) : true;
-      const matchesType = animalType ? ad.type.toLowerCase().includes(animalType.toLowerCase()) : true;
-      return matchesRegion && matchesType;
-    });
+        setResults(filteredOrders);
+        setTotalPages(Math.ceil(filteredOrders.length / 10)); //Пагинация на 10 элементов
+      }
+    } catch (error) {
+      console.error('Ошибка при загрузке данных:', error);
+    } finally {
+      setLoading(false);
+    }
+  }, [district, kind]);
 
-    setFilteredAds(filtered);
-  };
+  useEffect(() => {
+    fetchAnimals();
+  }, [district, kind, fetchAnimals]);
 
   return (
-    <main className="container mt-5">
-      <h2 className="text-center mb-4">Поиск объявлений о животных</h2>
-      <form onSubmit={handleFormSubmit}>
-        <div className="mb-3">
-          <label htmlFor="animalTypeInput" className="form-label">Вид животного</label>
+    <div className="container">
+      <h2 className="text-center mt-4">Поиск по объявлениям</h2>
+      <div className="row mb-4 mt-5">
+        <div className="col">
           <input
             type="text"
             className="form-control"
-            id="animalTypeInput"
-            placeholder="Введите вид животного (например, кошка, собака)"
-            value={animalType}
-            onChange={(e) => setAnimalType(e.target.value)}
-          />
-        </div>
-        <div className="mb-3">
-          <label htmlFor="regionInput" className="form-label">Район</label>
-          <input
-            type="text"
-            className="form-control"
-            id="regionInput"
             placeholder="Введите район"
-            value={region}
-            onChange={(e) => setRegion(e.target.value)}
+            value={district}
+            onChange={(e) => setDistrict(e.target.value)}
           />
         </div>
-        <button type="submit" className="btn btn-primary w-100">Найти объявления</button>
-      </form>
-
-      <div id="adsContainer" className="mt-4">
-        {filteredAds.length > 0 ? (
-          filteredAds.map(ad => <AdCard key={ad.id} ad={ad} />)
-        ) : (
-          <p>Объявлений не найдено.</p>
-        )}
+        <div className="col">
+          <input
+            type="text"
+            className="form-control"
+            placeholder="Введите вид животного"
+            value={kind}
+            onChange={(e) => setKind(e.target.value)}
+          />
+        </div>
       </div>
-    </main>
+      {loading ? (
+        <div className="text-center mt-4">
+          <div className="spinner-border text-primary" role="status">
+            <span className="visually-hidden">Загрузка...</span>
+          </div>
+        </div>
+      ) : (
+        <SearchResults results={results} totalPages={totalPages} />
+      )}
+    </div>
   );
-}
+};
 
 export default SearchPets;

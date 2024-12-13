@@ -53,9 +53,8 @@ body {
   }
 
   .ad img {
-    width: 250px;
-    height: 300px;
-    object-fit: cover;
+    height: 100%;
+    object-fit: fill;
     border-radius: 8px;
   }
 
@@ -78,3 +77,36 @@ body {
   footer p {
       color: white;
   }
+
+  .animal-image-small {
+    width: 100%;
+    object-fit: contain;
+    border-radius: 8px;
+  }
+
+  .btn-danger {
+   margin-left: 16px;
+}
+
+.btn-primary{
+    margin-right: 10px;
+}
+
+.col-md-4 {
+    margin: auto;
+
+}
+
+.card {
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.card:hover {
+  transform: scale(1.001);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+}
+
+.card-img-top {
+  border-radius: 8px 8px 0 0;
+}
+

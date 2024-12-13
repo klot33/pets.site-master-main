@@ -10,6 +10,9 @@ import React from 'react';
 import MyAccount from './pages/MyAccount';
 import ForgotPassword from './components/ForgotPassword';
 import ForgotLogin from './components/ForgotLogin';
+import AnimalDetail from './components/AnimalDetail';
+
+
 
 function Home() {
   return (
@@ -31,6 +34,8 @@ function Search() {
   return <SearchPets />;
 }
 
+
+
 function App() {
   return (
     <Router>
@@ -40,6 +45,8 @@ function App() {
         <Route path="/myaccount" element={<MyAccount />} />
         <Route path="/add-pet" element={<AddPet />} />
         <Route path="/search" element={<Search />} />
+        <Route path="/search/animal/:id" element={<AnimalDetail />} />
+        <Route path="/animal/:id" element={<AnimalDetail />} />
       </Routes>
       <Footer />
     </Router>

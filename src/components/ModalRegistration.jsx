@@ -4,16 +4,17 @@ import '../pages/css/my.css';
 
 function ModalRegistration() {
   const [formData, setFormData] = useState({
-    firstName: '',
-    lastName: '',
+    name: '',
+    phone: '',
     email: '',
     password: '',
-    confirmPassword: ''
+    password_confirmation: '',
+    confirm: 0, 
   });
 
   const [errorMessage, setErrorMessage] = useState('');
+  const [successMessage, setSuccessMessage] = useState('');
 
-  // Функция для закрытия модального окна
   const closeCurrentModal = (modalId) => {
     const modalElement = document.getElementById(modalId);
     if (modalElement) {
@@ -22,33 +23,39 @@ function ModalRegistration() {
         modalInstance.hide();
 
         modalElement.addEventListener('hidden.bs.modal', () => {
-          // Удаляем backdrop вручную после закрытия модального окна
           const backdrop = document.querySelector('.modal-backdrop');
           if (backdrop) {
             backdrop.remove();
           }
-          // Удаляем класс modal-open с body, чтобы страница снова прокручивалась
           document.body.classList.remove('modal-open');
-
-          // Перезагрузка страницы (если необходимо)
-          window.location.reload();
         });
       }
     }
   };
 
   const handleChange = (e) => {
+    const { id, value, type, checked } = e.target;
     setFormData({
       ...formData,
-      [e.target.id]: e.target.value
+      [id]: type === 'checkbox' ? (checked ? 1 : 0) : value,
     });
   };
 
   const validateForm = () => {
-    const { firstName, lastName, email, password, confirmPassword } = formData;
+    const { name, phone, email, password, password_confirmation, confirm } = formData;
 
-    if (!firstName || !lastName || !email || !password || !confirmPassword) {
-      setErrorMessage('Все поля обязательны для заполнения.');
+    if (!name || !phone || !email || !password || !password_confirmation || confirm === 0) {
+      setErrorMessage('Все поля обязательны для заполнения, и необходимо дать согласие на обработку данных.');
+      return false;
+    }
+
+    if (!/^[А-Яа-яёЁ\s-]+$/.test(name)) {
+      setErrorMessage('Имя должно содержать только кириллицу, пробелы или дефисы.');
+      return false;
+    }
+
+    if (!/^\+?\d+$/.test(phone)) {
+      setErrorMessage('Телефон должен содержать только цифры и знак +.');
       return false;
     }
 
@@ -57,12 +64,12 @@ function ModalRegistration() {
       return false;
     }
 
-    if (password.length < 6) {
-      setErrorMessage('Пароль должен быть не менее 6 символов.');
+    if (password.length < 7 || !/[A-Z]/.test(password) || !/[a-z]/.test(password) || !/\d/.test(password)) {
+      setErrorMessage('Пароль должен быть не менее 7 символов, содержать строчные, заглавные буквы и цифры.');
       return false;
     }
 
-    if (password !== confirmPassword) {
+    if (password !== password_confirmation) {
       setErrorMessage('Пароли не совпадают.');
       return false;
     }
@@ -71,22 +78,57 @@ function ModalRegistration() {
     return true;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+  
     if (validateForm()) {
-      closeCurrentModal('registrationModal');
-
-      setFormData({
-        firstName: '',
-        lastName: '',
-        email: '',
-        password: '',
-        confirmPassword: ''
-      });
-
-      console.log('Регистрация успешна:', formData);
+      try {
+        console.log('Отправляемые данные:', formData);
+  
+        var myHeaders = new Headers();
+        myHeaders.append("Content-Type", "application/json");
+  
+        const requestOptions = {
+          method: 'POST',
+          headers: myHeaders,
+          body: JSON.stringify(formData),
+          redirect: 'follow',
+        };
+  
+        const response = await fetch('https://pets.сделай.site/api/register', requestOptions);
+  
+        if (!response.ok) {
+          const errorData = await response.json();
+          
+          // Проверка конкретной ошибки на занятый email
+          if (response.status === 422 || errorData.errors?.email) {
+            setErrorMessage('Такой e-mail уже занят.');
+          } else if (errorData.message) {
+            setErrorMessage(errorData.message);
+          } else {
+            setErrorMessage(`Ошибка регистрации: ${response.status}`);
+          }
+          return;
+        }
+  
+        setSuccessMessage('Регистрация прошла успешно!');
+        setErrorMessage('');
+        setFormData({
+          name: '',
+          phone: '',
+          email: '',
+          password: '',
+          password_confirmation: '',
+          confirm: 0,
+        });
+        closeCurrentModal('registrationModal');
+      } catch (error) {
+        console.error('Ошибка при обработке:', error.message);
+        setErrorMessage('Произошла ошибка: ' + error.message);
+      }
     }
   };
+  
 
   return (
     <div>
@@ -103,25 +145,25 @@ function ModalRegistration() {
             <div className="modal-body">
               <form id="registrationForm" onSubmit={handleSubmit}>
                 <div className="mb-3">
-                  <label htmlFor="firstName" className="form-label">Имя</label>
+                  <label htmlFor="name" className="form-label">Имя</label>
                   <input
                     type="text"
                     className="form-control"
-                    id="firstName"
+                    id="name"
                     placeholder="Введите имя"
-                    value={formData.firstName}
+                    value={formData.name}
                     onChange={handleChange}
                     required
                   />
                 </div>
                 <div className="mb-3">
-                  <label htmlFor="lastName" className="form-label">Фамилия</label>
+                  <label htmlFor="phone" className="form-label">Телефон</label>
                   <input
                     type="text"
                     className="form-control"
-                    id="lastName"
-                    placeholder="Введите фамилию"
-                    value={formData.lastName}
+                    id="phone"
+                    placeholder="Введите телефон"
+                    value={formData.phone}
                     onChange={handleChange}
                     required
                   />
@@ -151,20 +193,32 @@ function ModalRegistration() {
                   />
                 </div>
                 <div className="mb-3">
-                  <label htmlFor="confirmPassword" className="form-label">Подтвердите пароль</label>
+                  <label htmlFor="password_confirmation" className="form-label">Подтвердите пароль</label>
                   <input
                     type="password"
                     className="form-control"
-                    id="confirmPassword"
+                    id="password_confirmation"
                     placeholder="Повторите пароль"
-                    value={formData.confirmPassword}
+                    value={formData.password_confirmation}
                     onChange={handleChange}
                     required
                   />
                 </div>
-                <p className="error text-danger" id="errorMessage">
-                  {errorMessage}
-                </p>
+                <div className="mb-3 form-check">
+                  <input
+                    type="checkbox"
+                    className="form-check-input"
+                    id="confirm"
+                    checked={formData.confirm === 1}
+                    onChange={handleChange}
+                    required
+                  />
+                  <label className="form-check-label" htmlFor="confirm">
+                    Я даю согласие на обработку персональных данных
+                  </label>
+                </div>
+                {errorMessage && <p className="error text-danger">{errorMessage}</p>}
+                {successMessage && <p className="success text-success">{successMessage}</p>}
                 <button type="submit" className="btn btn-primary w-100">Зарегистрироваться</button>
               </form>
             </div>
