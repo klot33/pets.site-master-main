@@ -2,11 +2,18 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import logo from '../image/logo.jpg';
 import ModalRegistration from './ModalRegistration';
-import ForgotLogin from './ForgotLogin';
-import ForgotPassword from './ForgotPassword';
 import ModalLogin from './ModalLogin';
 import '../pages/css/my.css'
+import QuickSearch from './QuickSearch';
+const handleNavbarCollapse = () => {
+  const navbarToggler = document.querySelector('.navbar-toggler');
+  const navbarCollapse = document.getElementById('navbarSupportedContent');
 
+  // Если navbar открыт, скрываем его
+  if (navbarCollapse.classList.contains('show')) {
+    navbarToggler.click();
+  }
+};
 function Header({ onShowRegistration, onShowLogin }) {
   return (
     <nav className="navbar navbar-expand-lg navbar-light bg-">
@@ -40,19 +47,12 @@ function Header({ onShowRegistration, onShowLogin }) {
               <Link className="nav-link" to="/add-pet">Добавить объявление</Link>
             </li>
             <li className="nav-item">
-              <Link className="nav-link" to="/search">Поиск по объявлениям</Link>
+              <Link className="nav-link" to="/Search">Поиск по объявлениям</Link>
             </li>
           </ul>
+          <QuickSearch host="https://pets.сделай.site" handleNavbarCollapse={handleNavbarCollapse} />
           <form className="d-flex">
-  <input className="form-control me-2" type="search" list="pets" placeholder="Поиск" aria-label="Search" />
   <button className="btn btn-primary" onclick>Поиск</button>
-  <datalist id="pets">
-    <option value="Кошка">
-    </option><option value="Собака">
-    </option><option value="Корова">
-    </option><option value="Крокодил">
-    </option><option value="Сова">
-    </option></datalist>
 </form>
         </div>
       </div>

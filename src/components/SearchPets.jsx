@@ -14,7 +14,7 @@ const SearchPets = () => {
   const fetchAnimals = useCallback(async () => {
     setLoading(true);
     try {
-      const response = await fetch(`https://pets.сделай.site/api/pets`);
+      const response = await fetch(`https://pets.сделай.site/api/search`);
       const data = await response.json();
       if (data.data?.orders) {
         const sortedAnimals = [...data.data.orders].sort((a, b) => new
